@@ -1,20 +1,20 @@
 =======================================================
-Assertion: UnvisitedMove() reaches goalAreaChecked
+Assertion: UnvisitedMove() reaches noSurvivors
 ********Verification Result********
-The Assertion (UnvisitedMove() reaches goalAreaChecked) is VALID.
+The Assertion (UnvisitedMove() reaches noSurvivors) is VALID.
 The following trace leads to a state where the condition is satisfied.
-<init -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveDown -> moveLeft -> moveLeft -> moveDown -> moveLeft -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveDown -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveRight -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveUp -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveUp -> moveUp -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveUp -> moveUp -> moveUp -> moveRight -> moveRight -> moveRight -> moveLeft -> moveLeft -> moveLeft -> moveDown -> moveDown -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveRight -> moveRight -> moveUp -> moveUp -> moveRight -> moveUp -> moveUp -> moveLeft -> moveLeft -> moveLeft -> moveUp -> moveLeft -> moveLeft -> moveLeft -> moveLeft>
+<init -> moveDown -> moveUp -> moveLeft -> moveLeft -> moveUp -> moveUp>
 
 ********Verification Setting********
 Admissible Behavior: All
-Search Engine: First Witness Trace using Depth First Search
+Search Engine: Shortest Witness Trace using Breadth First Search
 System Abstraction: False
 
 
 ********Verification Statistics********
-Visited States:210
-Total Transitions:330
-Time Used:0.0117516s
-Estimated Memory Used:8887.128KB
+Visited States:1947
+Total Transitions:2794
+Time Used:0.0812288s
+Estimated Memory Used:12147.72KB
 
 
