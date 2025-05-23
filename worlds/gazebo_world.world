@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane  -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+   
+
+    <!-- <include>
+      <uri>model://bowl</uri>
+      <name>bowl</name>
+    </include> -->
+
+    <gui>
+      <camera name="user_camera">
+        <pose>6 6 30 0 1.5707 3.1416</pose> <!-- offset 6 units on x and y, 30 units above origin, looking straight down -->
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+    
+
+  </world>
+</sdf>
+

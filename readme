@@ -1,0 +1,9 @@
+Commands for our project ->
+
+# Ensure that you are in ~/catkin_workspace/
+# Ensure that the Cloned Repository is in ~/catkin_workspace/src/AI-ROS-Group15
+catkin_make
+
+roslaunch group_15 launch_world.launch
+rosrun group_15 update_grid
+rosrun group_15 search_rescue

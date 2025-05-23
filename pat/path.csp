@@ -1,0 +1,35 @@
+#include "world.csp";
+
+#define MoveUpCond (xpos != 0) && (world[xpos-1][ypos] != Hostile) && (onBoard != maxCapacity || world[xpos-1][ypos] != Survivor);
+#define MoveUpCondVisited (world[xpos-1][ypos] == Visited);
+#define MoveUpCondNotVisited (world[xpos-1][ypos] != Visited);
+MoveUpIfVisited() = [MoveUpCond && MoveUpCondVisited] moveUp{xpos = xpos - 1; if(world[xpos][ypos] == Survivor) {onBoard++;}; world[xpos][ypos] = Visited; } -> Skip;
+MoveUpIfNotVisited() = [MoveUpCond && MoveUpCondNotVisited] moveUp{xpos = xpos - 1; if(world[xpos][ypos] == Survivor) {onBoard++;}; world[xpos][ypos] = Visited;} -> Skip;
+
+#define MoveDownCond (xpos != Rows - 1) && (world[xpos+1][ypos] != Hostile) && (onBoard != maxCapacity || world[xpos+1][ypos] != Survivor);
+#define MoveDownCondVisited (world[xpos+1][ypos] == Visited);
+#define MoveDownCondNotVisited (world[xpos+1][ypos] != Visited);
+MoveDownIfVisited() = [MoveDownCond && MoveDownCondVisited] moveDown{xpos = xpos + 1; if(world[xpos][ypos] == Survivor) {onBoard++;}; world[xpos][ypos] = Visited;} -> Skip;
+MoveDownIfNotVisited() = [MoveDownCond && MoveDownCondNotVisited] moveDown{xpos = xpos + 1; if(world[xpos][ypos] == Survivor) {onBoard++;}; world[xpos][ypos] = Visited;} -> Skip;
+
+#define MoveLeftCond (ypos != 0) && (world[xpos][ypos-1] != Hostile) && (onBoard != maxCapacity || world[xpos][ypos-1] != Survivor);
+#define MoveLeftCondVisited (world[xpos][ypos-1] == Visited);
+#define MoveLeftCondNotVisited (world[xpos][ypos-1] != Visited);
+MoveLeftIfVisited() = [MoveLeftCond && MoveLeftCondVisited] moveLeft{ypos = ypos - 1; if(world[xpos][ypos] == Survivor) {onBoard++;};world[xpos][ypos] = Visited;} -> Skip;
+MoveLeftIfNotVisited() = [MoveLeftCond && MoveLeftCondNotVisited] moveLeft{ypos = ypos - 1; if(world[xpos][ypos] == Survivor) {onBoard++;}; world[xpos][ypos] = Visited;} -> Skip;
+
+#define MoveRightCond (ypos != Cols - 1) && (world[xpos][ypos+1] != Hostile) && (onBoard != maxCapacity || world[xpos][ypos+1] != Survivor);
+#define MoveRightCondVisited (world[xpos][ypos+1] == Visited);
+#define MoveRightCondNotVisited (world[xpos][ypos+1] != Visited);
+MoveRightIfVisited() = [MoveRightCond && MoveRightCondVisited] moveRight{ypos = ypos + 1; if(world[xpos][ypos] == Survivor) {onBoard++;}; world[xpos][ypos] = Visited;} -> Skip;
+MoveRightIfNotVisited() = [MoveRightCond && MoveRightCondNotVisited] moveRight{ypos = ypos + 1; if(world[xpos][ypos] == Survivor) {onBoard++;}; world[xpos][ypos] = Visited;} -> Skip;
+
+MoveIfNotVisited() = MoveUpIfNotVisited() [] MoveDownIfNotVisited() [] MoveLeftIfNotVisited() [] MoveRightIfNotVisited();
+MoveIfVisited() = MoveUpIfVisited() [] MoveDownIfVisited() [] MoveLeftIfVisited() [] MoveRightIfVisited();
+UnvisitedMove() = (MoveIfVisited() [] MoveIfNotVisited());UnvisitedMove();
+VisitedMove() = (MoveIfNotVisited() [] MoveIfVisited());VisitedMove();
+
+
+#define home (xpos == SUB_HOME_X && ypos == SUB_HOME_Y);
+#define goalAreaChecked (&& i:{0..Rows-1}@(&& j:{0..Cols-1}@(world[i][j] == Visited || world[i][j] == Hostile)) && home);
+#define noSurvivors ((&& i:{0..Rows-1}@(&& j:{0..Cols-1}@(world[i][j] != Survivor)) && (onBoard != maxCapacity || home)) || (onBoard == maxCapacity && home));
