@@ -1,0 +1,1 @@
+// LLM: deepseek-r1:7b     Size: 4.7 GB    
