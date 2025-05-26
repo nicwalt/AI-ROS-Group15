@@ -7,5 +7,9 @@ catkin_make
 source ./devel/setup.sh
 
 roslaunch group_15 launch_world.launch
+
+// rosrun AI-Gemma // Example
+// rosrun AI-DeepSeek // Example
+
 rosrun group_15 update_grid
 rosrun group_15 search_rescue
