@@ -3,11 +3,7 @@ Assertion: UnvisitedMove() reaches goalAreaChecked
 ********Verification Result********
 The Assertion (UnvisitedMove() reaches goalAreaChecked) is VALID.
 The following trace leads to a state where the condition is satisfied.
-<<<<<<< Updated upstream
-<init -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveDown -> moveLeft -> moveLeft -> moveDown -> moveLeft -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveDown -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveRight -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveUp -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveUp -> moveUp -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveUp -> moveUp -> moveUp -> moveRight -> moveRight -> moveRight -> moveLeft -> moveLeft -> moveLeft -> moveDown -> moveDown -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveRight -> moveRight -> moveUp -> moveUp -> moveRight -> moveUp -> moveUp -> moveLeft -> moveLeft -> moveLeft -> moveUp -> moveLeft -> moveLeft -> moveLeft -> moveLeft>
-=======
 <init -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveDown -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveDown -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveDown -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveDown -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveUp -> moveUp -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveUp -> moveUp -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveRight -> moveUp -> moveUp -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveLeft -> moveUp>
->>>>>>> Stashed changes
 
 ********Verification Setting********
 Admissible Behavior: All
@@ -16,16 +12,9 @@ System Abstraction: False
 
 
 ********Verification Statistics********
-<<<<<<< Updated upstream
-Visited States:210
-Total Transitions:330
-Time Used:0.0117516s
-Estimated Memory Used:8887.128KB
-=======
 Visited States:283
 Total Transitions:341
-Time Used:0.0165054s
+Time Used:0.01588s
 Estimated Memory Used:9068.16KB
->>>>>>> Stashed changes
 
 

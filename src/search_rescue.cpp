@@ -15,6 +15,7 @@
 
 #define GAZEBO_SIMULATION_RATE 1
 #define SubIsHome(sub_x, sub_y) (sub_x == SUB_START_X && sub_y == SUB_START_Y)
+#define SubIsHome2(sub_x_2, sub_y_2) (sub_x_2 == SUB_START_X_2 && sub_y_2 == SUB_START_Y_2)
 
 #define SURVEY_AREA 0
 #define COLLECT_SURVIVORS 1
@@ -26,27 +27,35 @@ std::string homeDir = getenv("HOME");
 #define PAT_PATH_CSP_HOME_DIR homeDir + "/catkin_workspace/src/AI-ROS-Group15/pat/return_home.csp"
 #define PAT_PATH_CSP_COLLECT_SURVIVORS_DIR homeDir + "/catkin_workspace/src/AI-ROS-Group15/pat/collect_survivors.csp"
 #define PAT_OUTPUT_DIR homeDir + "/catkin_workspace/src/AI-ROS-Group15/pat/pat_output.txt"
+#define PAT_OUTPUT_DIR2 homeDir + "/catkin_workspace/src/AI-ROS-Group15/pat/pat_output2.txt"
 #define PAT_WORLD_DIR homeDir + "/catkin_workspace/src/AI-ROS-Group15/pat/world.csp"
+#define PAT_WORLD_DIR2 homeDir + "/catkin_workspace/src/AI-ROS-Group15/pat/world2.csp"
 #define MAX_BFS_TIME 10
 std::string PAT_CMD_EXPLORE = "mono " + PAT_EXE_DIR + " " + PAT_PATH_CSP_EXPLORE_DIR + " " + PAT_OUTPUT_DIR;
+std::string PAT_CMD_EXPLORE2 = "mono " + PAT_EXE_DIR + " " + PAT_PATH_CSP_EXPLORE_DIR + " " + PAT_OUTPUT_DIR2;
 std::string PAT_CMD_GO_HOME_BFS = "timeout " + std::to_string(MAX_BFS_TIME) + "s mono " + PAT_EXE_DIR + " -engine 1 " + PAT_PATH_CSP_HOME_DIR + " " + PAT_OUTPUT_DIR;
+std::string PAT_CMD_GO_HOME_BFS2 = "timeout " + std::to_string(MAX_BFS_TIME) + "s mono " + PAT_EXE_DIR + " -engine 1 " + PAT_PATH_CSP_HOME_DIR + " " + PAT_OUTPUT_DIR2;
 std::string PAT_CMD_GO_HOME_DFS = "mono " + PAT_EXE_DIR + " -engine 1 " + PAT_PATH_CSP_HOME_DIR + " " + PAT_OUTPUT_DIR;
+std::string PAT_CMD_GO_HOME_DFS2 = "mono " + PAT_EXE_DIR + " -engine 1 " + PAT_PATH_CSP_HOME_DIR + " " + PAT_OUTPUT_DIR2;
 std::string PAT_CMD_COLLECT_SURVIVORS_BFS = "timeout " + std::to_string(MAX_BFS_TIME) + "s mono " + PAT_EXE_DIR + " -engine 1 " + PAT_PATH_CSP_COLLECT_SURVIVORS_DIR + " " + PAT_OUTPUT_DIR;
+std::string PAT_CMD_COLLECT_SURVIVORS_BFS2 = "timeout " + std::to_string(MAX_BFS_TIME) + "s mono " + PAT_EXE_DIR + " -engine 1 " + PAT_PATH_CSP_COLLECT_SURVIVORS_DIR + " " + PAT_OUTPUT_DIR2;
 std::string PAT_CMD_COLLECT_SURVIVORS_DFS = "mono " + PAT_EXE_DIR + " " + PAT_PATH_CSP_COLLECT_SURVIVORS_DIR + " " + PAT_OUTPUT_DIR;
+std::string PAT_CMD_COLLECT_SURVIVORS_DFS2 = "mono " + PAT_EXE_DIR + " " + PAT_PATH_CSP_COLLECT_SURVIVORS_DIR + " " + PAT_OUTPUT_DIR2;
 
-void detect_hostiles(group_15::Sensor &hostile_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y);
-int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y);
+void detect_hostiles(group_15::Sensor &hostile_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int sub_id);
+int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int sub_id);
 std::pair<int, int> update_position(std::string &move, int &x, int &y);
-void update_directions(std::queue<std::string> &q);
+void update_directions(std::queue<std::string> &q, const std::string& output_file);
 void generate_world(int (&world)[BOARD_H][BOARD_W]);
-void generate_known_world(int (&world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard);
+void generate_known_world(int (&world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard, const std::string& world_file, int sub_id);
 std::vector<int> translate_world(int (&world)[BOARD_H][BOARD_W]);
-void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard, std::queue<std::string> &q, int &currentPath);
-void execute_move(int (&current_world)[BOARD_H][BOARD_W], int (&true_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, std::pair<int, int> &new_coords);
+void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard, std::queue<std::string> &q, int &currentPath, int sub_id);
+void execute_move(int sub_id, int (&current_world)[BOARD_H][BOARD_W], int (&true_world)[BOARD_H][BOARD_W], int &old_x, int &old_y, int new_x, int new_y, int other_sub_x, int other_sub_y);
 std_msgs::Int32MultiArray createGrid(int (&true_world)[BOARD_H][BOARD_W]);
 
 int main(int argc, char *argv[])
 {
+<<<<<<< Updated upstream
 	ros::init(argc, argv, "testing");
 	ros::NodeHandle n;
 	ros::ServiceClient gridClient = n.serviceClient<group_15::UpdateGrid>("/update_grid");
@@ -208,10 +217,230 @@ int main(int argc, char *argv[])
 		rate.sleep();
 		ros::spinOnce();
 	}
+=======
+    ros::init(argc, argv, "testing");
+    ros::NodeHandle n;
+    ros::ServiceClient gridClient = n.serviceClient<group_15::UpdateGrid>("/update_grid");
+    ros::ServiceClient hostileSensorClient1 = n.serviceClient<group_15::Sensor>("/sub1/hostile_sensor");
+    ros::ServiceClient survivorSensorClient1 = n.serviceClient<group_15::Sensor>("/sub1/survivor_sensor");
+    ros::ServiceClient hostileSensorClient2 = n.serviceClient<group_15::Sensor>("/sub2/hostile_sensor");
+    ros::ServiceClient survivorSensorClient2 = n.serviceClient<group_15::Sensor>("/sub2/survivor_sensor");
+    group_15::UpdateGrid grid_srv;
+    group_15::Sensor hostile_srv1, hostile_srv2;
+    group_15::Sensor survivor_srv1, survivor_srv2;
+    std_msgs::Int32MultiArray true_grid;
+
+    int survivors_saved = 0;
+    int survivors_seen = 0;
+    int OnBoard1 = 0, OnBoard2 = 0;
+    int true_world[BOARD_H][BOARD_W];
+    int current_world[BOARD_H][BOARD_W];
+    for (int i = 0; i < BOARD_H; i++)
+        for (int j = 0; j < BOARD_W; j++)
+            current_world[i][j] = EMPTY;
+    current_world[SUB_START_X][SUB_START_Y] = VISITED;
+    current_world[SUB_START_X_2][SUB_START_Y_2] = VISITED;
+    int sub1_x = SUB_START_X, sub1_y = SUB_START_Y;
+    int sub2_x = SUB_START_X_2, sub2_y = SUB_START_Y_2;
+    int currentPath1 = SURVEY_AREA, currentPath2 = SURVEY_AREA;
+
+    generate_world(true_world);
+
+    true_grid = createGrid(true_world);
+    grid_srv.request.grid = true_grid;
+
+    if (!gridClient.call(grid_srv))
+    {
+        ROS_ERROR("Failed to call update_grid service");
+        return EXIT_FAILURE;
+    }
+
+    std::queue<std::string> q1, q2;
+    hostile_srv1.request.sensorRange = HOSTILE_DETECTION_RANGE;
+    survivor_srv1.request.sensorRange = SURVIVOR_DETECTION_RANGE;
+    hostile_srv2.request.sensorRange = HOSTILE_DETECTION_RANGE;
+    survivor_srv2.request.sensorRange = SURVIVOR_DETECTION_RANGE;
+
+    if (!hostileSensorClient1.call(hostile_srv1) || !survivorSensorClient1.call(survivor_srv1) ||
+        !hostileSensorClient2.call(hostile_srv2) || !survivorSensorClient2.call(survivor_srv2))
+    {
+        ROS_ERROR("Failed to call sensor services");
+        return EXIT_FAILURE;
+    }
+
+    detect_hostiles(hostile_srv1, current_world, sub1_x, sub1_y, 1);
+    detect_hostiles(hostile_srv2, current_world, sub2_x, sub2_y, 2);
+    int newSurvivorsDetected1 = detect_survivors(survivor_srv1, current_world, sub1_x, sub1_y, 1);
+    int newSurvivorsDetected2 = detect_survivors(survivor_srv2, current_world, sub2_x, sub2_y, 2);
+
+    if (newSurvivorsDetected1 || newSurvivorsDetected2)
+    {
+        survivors_seen += newSurvivorsDetected1 + newSurvivorsDetected2;
+        if (newSurvivorsDetected1) currentPath1 = COLLECT_SURVIVORS;
+        if (newSurvivorsDetected2) currentPath2 = COLLECT_SURVIVORS;
+    }
+
+    regenerate_moves(current_world, sub1_x, sub1_y, OnBoard1, q1, currentPath1, 1);
+    regenerate_moves(current_world, sub2_x, sub2_y, OnBoard2, q2, currentPath2, 2);
+
+    std::string next_move1, next_move2;
+    int old_sub1_x, old_sub1_y, old_sub2_x, old_sub2_y;
+
+    ros::Rate rate(GAZEBO_SIMULATION_RATE);
+	bool collision_occurred = false;
+
+    while (ros::ok())
+    {
+         if (SubIsHome(sub1_x, sub1_y) && OnBoard1) {
+        survivors_saved += OnBoard1;
+        std::cout << "Sub1 saved " << OnBoard1 << " survivors. Total survivors now saved: " << survivors_saved << std::endl;
+        OnBoard1 = 0;
+    }
+
+    if (SubIsHome2(sub2_x, sub2_y) && OnBoard2) {
+        survivors_saved += OnBoard2;
+        std::cout << "Sub2 saved " << OnBoard2 << " survivors. Total survivors now saved: " << survivors_saved << std::endl;
+        OnBoard2 = 0;
+    }
+
+        if (q1.empty()) {
+        if ((survivors_saved + OnBoard1 + OnBoard2) == SURVIVOR_COUNT) {
+            if (SubIsHome(sub1_x, sub1_y)) {
+                currentPath1 = GO_HOME;
+            }
+        } else {
+            currentPath1 = (survivors_seen > (survivors_saved + OnBoard1 + OnBoard2)) 
+                ? COLLECT_SURVIVORS : SURVEY_AREA;
+        }
+        regenerate_moves(current_world, sub1_x, sub1_y, OnBoard1, q1, currentPath1, 1);
+    }
+
+    if (q2.empty()) {
+        if ((survivors_saved + OnBoard1 + OnBoard2) == SURVIVOR_COUNT) {
+            if (SubIsHome2(sub2_x, sub2_y)) {
+                currentPath2 = GO_HOME;
+            }
+        } else {
+            currentPath2 = (survivors_seen > (survivors_saved + OnBoard1 + OnBoard2)) 
+                ? COLLECT_SURVIVORS : SURVEY_AREA;
+        }
+        regenerate_moves(current_world, sub2_x, sub2_y, OnBoard2, q2, currentPath2, 2);
+    }
+
+        next_move1 = q1.front();
+        next_move2 = q2.front();
+
+        std::pair<int, int> new_coords1 = update_position(next_move1, sub1_x, sub1_y);
+		std::pair<int, int> new_coords2 = update_position(next_move2, sub2_x, sub2_y);
+		int new_x1 = new_coords1.first, new_y1 = new_coords1.second;
+		int new_x2 = new_coords2.first, new_y2 = new_coords2.second;
+
+
+         if (current_world[new_x1][new_y1] == HOSTILE) {
+        regenerate_moves(current_world, sub1_x, sub1_y, OnBoard1, q1, currentPath1, 1);
+        rate.sleep();
+        ros::spinOnce();
+        continue;
+    }
+
+    if (current_world[new_x2][new_y2] == HOSTILE) {
+        regenerate_moves(current_world, sub2_x, sub2_y, OnBoard2, q2, currentPath2, 2);
+        rate.sleep();
+        ros::spinOnce();
+        continue;
+    }
+
+	collision_occurred = (new_x1 == new_x2 && new_y1 == new_y2);
+	q1.pop();
+    q2.pop();
+
+	if (collision_occurred) {
+        new_x2 = sub2_x;
+        new_y2 = sub2_y;
+        ROS_WARN("Collision detected! Sub2 waiting at (%d, %d)", sub2_x, sub2_y);
+    }
+
+         // Pick up survivors
+    if (current_world[new_x1][new_y1] == SURVIVOR) {
+        OnBoard1++;
+        std::cout << "Sub1 now has " << OnBoard1 << " survivors onboard" << std::endl;
+    }
+    
+    if (!collision_occurred && current_world[new_x2][new_y2] == SURVIVOR) {
+        OnBoard2++;
+        std::cout << "Sub2 now has " << OnBoard2 << " survivors onboard" << std::endl;
+    }
+
+         int old_sub1_x = sub1_x, old_sub1_y = sub1_y;
+    	int old_sub2_x = sub2_x, old_sub2_y = sub2_y;
+
+    	execute_move(1, current_world, true_world, old_sub1_x, old_sub1_y, new_x1, new_y1, old_sub2_x, old_sub2_y);
+    	if (!collision_occurred) {
+        execute_move(2, current_world, true_world, old_sub2_x, old_sub2_y, new_x2, new_y2, new_x1, new_y1);
+    }
+        sub1_x = new_x1;
+    	sub1_y = new_y1;
+    if (!collision_occurred) {
+        sub2_x = new_x2;
+        sub2_y = new_y2;
+    }
+        true_grid = createGrid(true_world);
+    grid_srv.request.grid = true_grid;
+    if (!gridClient.call(grid_srv)) {
+        ROS_ERROR("Failed to call update_grid service");
+        return EXIT_FAILURE;
+    }
+
+         if (!hostileSensorClient1.call(hostile_srv1) || 
+        !survivorSensorClient1.call(survivor_srv1) ||
+        !hostileSensorClient2.call(hostile_srv2) || 
+        !survivorSensorClient2.call(survivor_srv2)) {
+        ROS_ERROR("Failed to call sensor services");
+        return EXIT_FAILURE;
+    }
+
+         detect_hostiles(hostile_srv1, current_world, sub1_x, sub1_y, 1);
+    detect_hostiles(hostile_srv2, current_world, sub2_x, sub2_y, 2);
+    
+    int newSurvivorsDetected1 = detect_survivors(survivor_srv1, current_world, sub1_x, sub1_y, 1);
+    int newSurvivorsDetected2 = detect_survivors(survivor_srv2, current_world, sub2_x, sub2_y, 2);
+
+        if (newSurvivorsDetected1 || newSurvivorsDetected2) {
+        survivors_seen += newSurvivorsDetected1 + newSurvivorsDetected2;
+        if (newSurvivorsDetected1) {
+            currentPath1 = COLLECT_SURVIVORS;
+            regenerate_moves(current_world, sub1_x, sub1_y, OnBoard1, q1, currentPath1, 1);
+        }
+        if (newSurvivorsDetected2) {
+            currentPath2 = COLLECT_SURVIVORS;
+            regenerate_moves(current_world, sub2_x, sub2_y, OnBoard2, q2, currentPath2, 2);
+        }
+    }
+
+        if (OnBoard1 == SUB_CAP) {
+        currentPath1 = GO_HOME;
+        regenerate_moves(current_world, sub1_x, sub1_y, OnBoard1, q1, currentPath1, 1);
+    }
+
+    if (OnBoard2 == SUB_CAP) {
+        currentPath2 = GO_HOME;
+        regenerate_moves(current_world, sub2_x, sub2_y, OnBoard2, q2, currentPath2, 2);
+    }
+
+	if (collision_occurred) {
+        regenerate_moves(current_world, sub2_x, sub2_y, OnBoard2, q2, currentPath2, 2);
+        collision_occurred = false;
+    }
+
+        rate.sleep();
+        ros::spinOnce();
+    }
+>>>>>>> Stashed changes
 }
 
-void detect_hostiles(group_15::Sensor &hostile_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y)
+void detect_hostiles(group_15::Sensor &hostile_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int sub_id)
 {
+<<<<<<< Updated upstream
 	if (hostile_srv.response.objectEast)
 		for (int i = 0; i < hostile_srv.request.sensorRange; i++)
 			if (hostile_srv.response.eastRadar[i])
@@ -240,10 +469,37 @@ void detect_hostiles(group_15::Sensor &hostile_srv, int (&curr_world)[BOARD_H][B
 				curr_world[sub_x + 1 + i][sub_y] = HOSTILE;
 				ROS_INFO("Robot has detected a hostile south!");
 			}
+=======
+    if (hostile_srv.response.objectEast)
+        for (int i = 0; i < hostile_srv.request.sensorRange; i++)
+            if (hostile_srv.response.eastRadar[i])
+            {
+                curr_world[sub_x][sub_y + 1 + i] = HOSTILE;
+            }
+    if (hostile_srv.response.objectWest)
+        for (int i = 0; i < hostile_srv.request.sensorRange; i++)
+            if (hostile_srv.response.westRadar[i])
+            {
+                curr_world[sub_x][sub_y - 1 - i] = HOSTILE;
+            }
+    if (hostile_srv.response.objectNorth)
+        for (int i = 0; i < hostile_srv.request.sensorRange; i++)
+            if (hostile_srv.response.northRadar[i])
+            {
+                curr_world[sub_x - 1 - i][sub_y] = HOSTILE;
+            }
+    if (hostile_srv.response.objectSouth)
+        for (int i = 0; i < hostile_srv.request.sensorRange; i++)
+            if (hostile_srv.response.southRadar[i])
+            {
+                curr_world[sub_x + 1 + i][sub_y] = HOSTILE;
+            }
+>>>>>>> Stashed changes
 }
 
-int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y)
+int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int sub_id)
 {
+<<<<<<< Updated upstream
 	int newSurvivorsDetected = 0;
 	if (survivor_srv.response.objectEast)
 		for (int i = 0; i < survivor_srv.request.sensorRange; i++)
@@ -282,93 +538,131 @@ int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][
 					ROS_INFO("Robot has detected a survivor south!");
 				}
 	return newSurvivorsDetected;
+=======
+    int newSurvivorsDetected = 0;
+    if (survivor_srv.response.objectEast)
+        for (int i = 0; i < survivor_srv.request.sensorRange; i++)
+            if (survivor_srv.response.eastRadar[i])
+                if (curr_world[sub_x][sub_y + 1 + i] != SURVIVOR)
+                {
+                    newSurvivorsDetected++;
+                    curr_world[sub_x][sub_y + 1 + i] = SURVIVOR;
+                }
+    if (survivor_srv.response.objectWest)
+        for (int i = 0; i < survivor_srv.request.sensorRange; i++)
+            if (survivor_srv.response.westRadar[i])
+                if (curr_world[sub_x][sub_y - 1 - i] != SURVIVOR)
+                {
+                    newSurvivorsDetected++;
+                    curr_world[sub_x][sub_y - 1 - i] = SURVIVOR;
+                }
+    if (survivor_srv.response.objectNorth)
+        for (int i = 0; i < survivor_srv.request.sensorRange; i++)
+            if (survivor_srv.response.northRadar[i])
+                if (curr_world[sub_x - 1 - i][sub_y] != SURVIVOR)
+                {
+                    newSurvivorsDetected++;
+                    curr_world[sub_x - 1 - i][sub_y] = SURVIVOR;
+                }
+    if (survivor_srv.response.objectSouth)
+        for (int i = 0; i < survivor_srv.request.sensorRange; i++)
+            if (survivor_srv.response.southRadar[i])
+                if (curr_world[sub_x + 1 + i][sub_y] != SURVIVOR)
+                {
+                    newSurvivorsDetected++;
+                    curr_world[sub_x + 1 + i][sub_y] = SURVIVOR;
+                }
+    return newSurvivorsDetected;
+>>>>>>> Stashed changes
 }
 
 std::pair<int, int> update_position(std::string &move, int &x, int &y)
 {
-	if (move == "moveRight")
-		return {x, y + 1};
-	else if (move == "moveLeft")
-		return {x, y - 1};
-	else if (move == "moveUp")
-		return {x - 1, y};
-	else if (move == "moveDown")
-		return {x + 1, y};
-	std::cerr << "update_position found invalid move: " << move << std::endl;
-	return {x, y};
+    if (move == "moveRight")
+        return {x, y + 1};
+    else if (move == "moveLeft")
+        return {x, y - 1};
+    else if (move == "moveUp")
+        return {x - 1, y};
+    else if (move == "moveDown")
+        return {x + 1, y};
+    std::cerr << "update_position found invalid move: " << move << std::endl;
+    return {x, y};
 }
 
-void update_directions(std::queue<std::string> &q)
+void update_directions(std::queue<std::string> &q, const std::string& output_file)
 {
-	std::ifstream pat_output(PAT_OUTPUT_DIR);
-	if (!pat_output.is_open())
-	{
-		std::cerr << "Failed to open PAT output file!" << std::endl;
-		exit(1);
-	}
-	while (!q.empty())
-		q.pop();
-	std::string line;
-	std::string move;
-	while (getline(pat_output, line))
-	{							
-		if (line[0] == '<') 
-		{
-			std::istringstream ss(line);
-			ss >> move;
-			while (ss >> move) 
-			{
-				ss >> move;
-				q.push(move); 
-			}
-			q.back().pop_back();
-			break; 
-		}
-	}
-	pat_output.close();
-	return;
+    std::ifstream pat_output(output_file);
+    if (!pat_output.is_open())
+    {
+        std::cerr << "Failed to open PAT output file!" << std::endl;
+        exit(1);
+    }
+    while (!q.empty())
+        q.pop();
+    std::string line;
+    std::string move;
+    while (getline(pat_output, line))
+    {							
+        if (line[0] == '<') 
+        {
+            std::istringstream ss(line);
+            ss >> move;
+            while (ss >> move) 
+            {
+                ss >> move;
+                q.push(move); 
+            }
+            q.back().pop_back();
+            break; 
+        }
+    }
+    pat_output.close();
+    return;
 }
 
 void generate_world(int (&world)[BOARD_H][BOARD_W])
 {
-	for (int i = 0; i < BOARD_H; ++i)
-		for (int j = 0; j < BOARD_W; ++j)
-			world[i][j] = EMPTY;
+    for (int i = 0; i < BOARD_H; ++i)
+        for (int j = 0; j < BOARD_W; ++j)
+            world[i][j] = EMPTY;
 
-	world[SUB_START_X][SUB_START_Y] = SUB;
+    world[SUB_START_X][SUB_START_Y] = SUB;
+    world[SUB_START_X_2][SUB_START_Y_2] = SUB2;
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> rowDist(0, BOARD_H - 1);
-	std::uniform_int_distribution<int> colDist(0, BOARD_W - 1);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> rowDist(0, BOARD_H - 1);
+    std::uniform_int_distribution<int> colDist(0, BOARD_W - 1);
 
-	int placed = 0;
-	while (placed < SURVIVOR_COUNT)
-	{
-		int rand_row = rowDist(gen);
-		int rand_col = colDist(gen);
-		if (world[rand_row][rand_col] == EMPTY)
-		{
-			world[rand_row][rand_col] = SURVIVOR;
-			placed++;
-		}
-	}
+    int placed = 0;
+    while (placed < SURVIVOR_COUNT)
+    {
+        int rand_row = rowDist(gen);
+        int rand_col = colDist(gen);
+        if (world[rand_row][rand_col] == EMPTY)
+        {
+            world[rand_row][rand_col] = SURVIVOR;
+            placed++;
+        }
+    }
 
-	placed = 0;
-	while (placed < HOSTILE_COUNT)
-	{
-		int rand_row = rowDist(gen);
-		int rand_col = colDist(gen);
-		if (world[rand_row][rand_col] == EMPTY)
-		{
-			world[rand_row][rand_col] = HOSTILE;
-			placed++;
-		}
-	}
+    placed = 0;
+    while (placed < HOSTILE_COUNT)
+    {
+        int rand_row = rowDist(gen);
+        int rand_col = colDist(gen);
+        if (world[rand_row][rand_col] == EMPTY)
+        {
+            world[rand_row][rand_col] = HOSTILE;
+            placed++;
+        }
+    }
 }
 
-void generate_known_world(int (&world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard)
+void generate_known_world(int (&world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard, const std::string& world_file, int sub_id)
 {
+<<<<<<< Updated upstream
 	std::ofstream file(PAT_WORLD_DIR);
 	if (!file.is_open())
 	{
@@ -408,19 +702,60 @@ void generate_known_world(int (&world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y
 	file << "var onBoard:{0..maxCapacity} = " << onBoard << ";\n";
 
 	file.close();
+=======
+    std::ofstream file(world_file);
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to save the current world to world.csp" << std::endl;
+        exit(1);
+    }
+
+    file << "#define Visited " << VISITED << ";\n";
+    file << "#define Unvisited " << EMPTY << ";\n";
+    file << "#define Sub " << (sub_id == 1 ? SUB : SUB2) << ";\n";
+    file << "#define Hostile " << HOSTILE << ";\n";
+    file << "#define Survivor " << SURVIVOR << ";\n\n";
+    file << "#define SUB_HOME_X " << (sub_id == 1 ? SUB_START_X : SUB_START_X_2) << ";\n";
+    file << "#define SUB_HOME_Y " << (sub_id == 1 ? SUB_START_Y : SUB_START_Y_2) << ";\n";
+    file << "#define Rows " << BOARD_H << ";\n";
+    file << "#define Cols " << BOARD_W << ";\n";
+    file << "#define maxCapacity " << SUB_CAP << ";\n";
+
+    file << "\nvar world[Rows][Cols]:{Visited..Survivor} = [\n";
+    for (int i = 0; i < BOARD_H; i++)
+    {
+        for (int j = 0; j < BOARD_W; j++)
+        {
+            if (i == BOARD_H - 1 && j == BOARD_W - 1)
+                file << world[i][j];
+            else
+                file << world[i][j] << ", ";
+        }
+        file << "\n";
+    }
+    file << "];\n\n";
+
+    file << "// Position of sub\n";
+    file << "var xpos:{0..Rows-1} = " << sub_x << ";\n";
+    file << "var ypos:{0..Cols-1} = " << sub_y << ";\n";
+    file << "var onBoard:{0..maxCapacity} = " << onBoard << ";\n";
+
+    file.close();
+>>>>>>> Stashed changes
 }
 
 std::vector<int> translate_world(int (&world)[BOARD_H][BOARD_W])
 {
-	std::vector<int> vec(BOARD_W * BOARD_H, EMPTY);
-	for (int i = 0; i < BOARD_H; i++)
-		for (int j = 0; j < BOARD_W; j++)
-			vec[i * BOARD_W + j] = world[i][j];
-	return vec;
+    std::vector<int> vec(BOARD_W * BOARD_H, EMPTY);
+    for (int i = 0; i < BOARD_H; i++)
+        for (int j = 0; j < BOARD_W; j++)
+            vec[i * BOARD_W + j] = world[i][j];
+    return vec;
 }
 
-void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard, std::queue<std::string> &q, int &currentPath)
+void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, int &onBoard, std::queue<std::string> &q, int &currentPath, int sub_id)
 {
+<<<<<<< Updated upstream
 	generate_known_world(current_world, sub_x, sub_y, onBoard);
 
 	if (currentPath == SURVEY_AREA)
@@ -488,30 +823,101 @@ void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &s
 	}
 
 	update_directions(q);
+=======
+    const std::string world_file = (sub_id == 1) ? PAT_WORLD_DIR : PAT_WORLD_DIR2;
+    const std::string output_file = (sub_id == 1) ? PAT_OUTPUT_DIR : PAT_OUTPUT_DIR2;
+
+    generate_known_world(current_world, sub_x, sub_y, onBoard, world_file, sub_id);
+
+    if (currentPath == SURVEY_AREA)
+    {
+        const std::string cmd = (sub_id == 1) ? PAT_CMD_EXPLORE : PAT_CMD_EXPLORE2;
+        std::system(cmd.c_str());
+    }
+    else if (currentPath == COLLECT_SURVIVORS)
+    {
+        const std::string cmd_bfs = (sub_id == 1) ? PAT_CMD_COLLECT_SURVIVORS_BFS : PAT_CMD_COLLECT_SURVIVORS_BFS2;
+        const std::string cmd_dfs = (sub_id == 1) ? PAT_CMD_COLLECT_SURVIVORS_DFS : PAT_CMD_COLLECT_SURVIVORS_DFS2;
+        int status = std::system(cmd_bfs.c_str());
+        if (status < 0)
+        {
+            std::cout << "There has been a fatal error!: " << strerror(errno) << '\n';
+            exit(1);
+        }
+        else
+        {
+            if (WIFEXITED(status))
+            {
+                if (WEXITSTATUS(status) == 124)
+                { 
+                    std::system(cmd_dfs.c_str());
+                }
+            }
+            else
+            {
+                std::cout << "PAT call was killed :(\n";
+                exit(1);
+            }
+        }
+    }
+    else if (currentPath == GO_HOME)
+    {
+        const std::string cmd_bfs = (sub_id == 1) ? PAT_CMD_GO_HOME_BFS : PAT_CMD_GO_HOME_BFS2;
+        const std::string cmd_dfs = (sub_id == 1) ? PAT_CMD_GO_HOME_DFS : PAT_CMD_GO_HOME_DFS2;
+        int status = std::system(cmd_bfs.c_str());
+        if (status < 0)
+        {
+            std::cout << "There has been a fatal error!: " << strerror(errno) << '\n';
+            exit(1);
+        }
+        else
+        {
+            if (WIFEXITED(status))
+            {
+                if (WEXITSTATUS(status) == 124)
+                { 
+                    std::system(cmd_dfs.c_str());
+                }
+            }
+            else
+            {
+                std::cout << "PAT call was killed :(\n";
+                exit(1);
+            }
+        }
+    }
+    else
+    {
+        ROS_WARN("Received unknown path command! Aborting mission!");
+        exit(1);
+    }
+
+    update_directions(q, output_file);
+>>>>>>> Stashed changes
 }
 
-void execute_move(int (&current_world)[BOARD_H][BOARD_W], int (&true_world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y, std::pair<int, int> &new_coords)
+void execute_move(int sub_id, int (&current_world)[BOARD_H][BOARD_W], int (&true_world)[BOARD_H][BOARD_W], int &old_x, int &old_y, int new_x, int new_y, int other_sub_x, int other_sub_y)
 {
-	int new_x = new_coords.first;
-	int new_y = new_coords.second;
-	current_world[new_x][new_y] = VISITED;
+    current_world[new_x][new_y] = VISITED;
 
-	true_world[sub_x][sub_y] = VISITED;
-	true_world[new_x][new_y] = SUB;
+    if (!(old_x == other_sub_x && old_y == other_sub_y)) {
+        true_world[old_x][old_y] = VISITED;
+    }
+    true_world[new_x][new_y] = (sub_id == 1) ? SUB : SUB2;
 }
 
 std_msgs::Int32MultiArray createGrid(int (&true_world)[BOARD_H][BOARD_W])
 {
-	std_msgs::Int32MultiArray true_grid;
-	true_grid.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	true_grid.layout.dim.push_back(std_msgs::MultiArrayDimension());
-	true_grid.layout.dim[0].label = "height";
-	true_grid.layout.dim[1].label = "width";
-	true_grid.layout.dim[0].size = BOARD_H;
-	true_grid.layout.dim[1].size = BOARD_W;
-	true_grid.layout.dim[0].stride = BOARD_H * BOARD_W;
-	true_grid.layout.dim[1].stride = BOARD_W;
-	true_grid.layout.data_offset = 0;
-	true_grid.data = translate_world(true_world);
-	return true_grid;
+    std_msgs::Int32MultiArray true_grid;
+    true_grid.layout.dim.push_back(std_msgs::MultiArrayDimension());
+    true_grid.layout.dim.push_back(std_msgs::MultiArrayDimension());
+    true_grid.layout.dim[0].label = "height";
+    true_grid.layout.dim[1].label = "width";
+    true_grid.layout.dim[0].size = BOARD_H;
+    true_grid.layout.dim[1].size = BOARD_W;
+    true_grid.layout.dim[0].stride = BOARD_H * BOARD_W;
+    true_grid.layout.dim[1].stride = BOARD_W;
+    true_grid.layout.data_offset = 0;
+    true_grid.data = translate_world(true_world);
+    return true_grid;
 }
