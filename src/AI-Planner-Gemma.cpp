@@ -1,18 +1,33 @@
+// My AI-Planner-Gemma.cpp
+
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "gazebo_msgs/ModelStates.h"
+#include "sensor_msgs/Range.h"
 #include <curl/curl.h>
 #include <sstream>
 
 const int GRID_MIN = 0;
 const int GRID_MAX = 7;
 
-// int robot_x = 4;
-// int robot_y = 4;
-// float sonar_front = 1.2;
-// float sonar_left = 0.4;
-// float sonar_right = 0.5;
+int robot_x = 0;
+int robot_y = 0;
+float sonar_front = 0.0;
+float sonar_left = 0.0;
+float sonar_right = 0.0;
 
 ros::Publisher proposed_pub;
+
+
+void modelStateCallback(const gazebo_msgs::ModelStates::ConstPtr& msg) {
+    auto it = std::find(msg->name.begin(), msg->name.end(), "robot");
+    if (it != msg->name.end()) {
+        int index = std::distance(msg->name.begin(), it);
+        geometry_msgs::Pose pose = msg->pose[index];
+        robot_x = static_cast<int>(pose.position.x);
+        robot_y = static_cast<int>(pose.position.y);
+    }
+}
 
 // === GEMMA CALL ===
 std::string sendToOllama(const std::string& prompt) {
@@ -61,7 +76,7 @@ std::string sendToOllama(const std::string& prompt) {
 // === PROMPT BUILDING ===
 std::string buildPrompt() {
     std::stringstream ss;
-    ss << R"(You are a robotics assistant operating in a 8x8 grid (0–7). Respond ONLY with one movement command: "move north", "move south", "move east", "move west", or "stay".)"
+    ss << R"(You are a robotics assistant operating in a 8x8 grid (0-7). Respond ONLY with one movement command: "move north", "move south", "move east", "move west", or "stay".)"
        << "\nLocation: (" << robot_x << "," << robot_y << ")"
        << "\nSonar Front: " << sonar_front << "m"
        << "\nSonar Left: " << sonar_left << "m"
@@ -83,7 +98,6 @@ void validatorCallback(const std_msgs::String::ConstPtr& msg) {
     }
 }
 
-// === MAIN ===
 int main(int argc, char **argv) {
     ros::init(argc, argv, "ai_validator_gemma");
     ros::NodeHandle nh;
@@ -94,6 +108,8 @@ int main(int argc, char **argv) {
     ros::Rate loop_rate(0.2);  // 1 action every 5 seconds
 
     while (ros::ok()) {
+        ros::Subscriber pose_sub = nh.subscribe("/gazebo/model_states", 10, modelStateCallback);
+
         std::string prompt = buildPrompt();
         std::string action = sendToOllama(prompt);
 
