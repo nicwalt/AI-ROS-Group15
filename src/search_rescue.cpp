@@ -1,3 +1,5 @@
+// search_rescue.cpp
+
 #include <ros/ros.h>
 #include "group_15/UpdateGrid.h"
 #include "group_15/Sensor.h"
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
 
 	if (newSurvivorsDetected)
 	{
-		ROS_INFO("New survivor(s) detected!");
+		// ROS_INFO("New survivor(s) detected!");
 		survivors_seen += newSurvivorsDetected;
 		currentPath = COLLECT_SURVIVORS;
     }
@@ -108,7 +110,7 @@ int main(int argc, char *argv[])
 
 	while (ros::ok())
 	{
-		ROS_INFO("-- Start of move cycle --");
+		// ROS_INFO("-- Start of move cycle --");
 
 		if (SubIsHome(sub_x, sub_y) && OnBoard)
 		{
@@ -123,7 +125,7 @@ int main(int argc, char *argv[])
 			{
 				if (SubIsHome(sub_x, sub_y))
 				{
-					ROS_INFO("Mission successful!\nFinal internal representation of environment:");
+					// ROS_INFO("Mission successful!\nFinal internal representation of environment:");
 					for (int i = 0; i < BOARD_H; i++)
 					{
 						for (int j = 0; j < BOARD_W; j++)
@@ -141,7 +143,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				ROS_INFO("We've run out of moves, but there's still people left to be saved!");
+				// ROS_INFO("We've run out of moves, but there's still people left to be saved!");
 				if (survivors_seen > (survivors_saved + OnBoard))
 					currentPath = COLLECT_SURVIVORS;
 				else											
@@ -151,7 +153,7 @@ int main(int argc, char *argv[])
 		}
 		next_move = std::string(q.front());
 		q.pop();
-		ROS_INFO("Next move is: %s", next_move.c_str());
+		// ROS_INFO("Next move is: %s", next_move.c_str());
 
 		std::pair<int, int> new_coords = update_position(next_move, sub_x, sub_y);
 		int new_x = new_coords.first;
@@ -159,7 +161,7 @@ int main(int argc, char *argv[])
 
 		if (current_world[new_x][new_y] == HOSTILE)
 		{
-			ROS_INFO("About to move into hostile, recalculating PAT directions");
+			// ROS_INFO("About to move into hostile, recalculating PAT directions");
 			regenerate_moves(current_world, sub_x, sub_y, OnBoard, q, currentPath);
 			rate.sleep();
 			continue;
@@ -167,7 +169,7 @@ int main(int argc, char *argv[])
 
 		if (current_world[new_x][new_y] == SURVIVOR)
 		{
-			ROS_INFO("About to pick up a survivor :) Hooray!");
+			// ROS_INFO("About to pick up a survivor :) Hooray!");
 			OnBoard++;
 			std::cout << "Now have " << OnBoard << " survivors onboard" << std::endl;
 		}
@@ -198,13 +200,13 @@ int main(int argc, char *argv[])
 
 		if (newSurvivorsDetected)
 		{
-			ROS_INFO("New survivor(s) detected!");
+			// ROS_INFO("New survivor(s) detected!");
 			survivors_seen += newSurvivorsDetected;
 			currentPath = COLLECT_SURVIVORS;
 			regenerate_moves(current_world, sub_x, sub_y, OnBoard, q, currentPath);
 		}
 
-		ROS_INFO("-- End of move cycle --\n");
+		// ROS_INFO("-- End of move cycle --\n");
 		rate.sleep();
 		ros::spinOnce();
 	}
@@ -217,28 +219,28 @@ void detect_hostiles(group_15::Sensor &hostile_srv, int (&curr_world)[BOARD_H][B
 			if (hostile_srv.response.eastRadar[i])
 			{
 				curr_world[sub_x][sub_y + 1 + i] = HOSTILE;
-				ROS_INFO("Robot has detected a hostile east!");
+				// ROS_INFO("Robot has detected a hostile east!");
 			}
 	if (hostile_srv.response.objectWest)
 		for (int i = 0; i < hostile_srv.request.sensorRange; i++)
 			if (hostile_srv.response.westRadar[i])
 			{
 				curr_world[sub_x][sub_y - 1 - i] = HOSTILE;
-				ROS_INFO("Robot has detected a hostile west!");
+				// ROS_INFO("Robot has detected a hostile west!");
 			}
 	if (hostile_srv.response.objectNorth)
 		for (int i = 0; i < hostile_srv.request.sensorRange; i++)
 			if (hostile_srv.response.northRadar[i])
 			{
 				curr_world[sub_x - 1 - i][sub_y] = HOSTILE;
-				ROS_INFO("Robot has detected a hostile north!");
+				// ROS_INFO("Robot has detected a hostile north!");
 			}
 	if (hostile_srv.response.objectSouth)
 		for (int i = 0; i < hostile_srv.request.sensorRange; i++)
 			if (hostile_srv.response.southRadar[i])
 			{
 				curr_world[sub_x + 1 + i][sub_y] = HOSTILE;
-				ROS_INFO("Robot has detected a hostile south!");
+				// ROS_INFO("Robot has detected a hostile south!");
 			}
 }
 
@@ -252,7 +254,7 @@ int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][
 				{
 					newSurvivorsDetected++;
 					curr_world[sub_x][sub_y + 1 + i] = SURVIVOR;
-					ROS_INFO("Robot has detected a survivor east!");
+					// ROS_INFO("Robot has detected a survivor east!");
 				}
 	if (survivor_srv.response.objectWest)
 		for (int i = 0; i < survivor_srv.request.sensorRange; i++)
@@ -261,7 +263,7 @@ int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][
 				{
 					newSurvivorsDetected++;
 					curr_world[sub_x][sub_y - 1 - i] = SURVIVOR;
-					ROS_INFO("Robot has detected a survivor west!");
+					// ROS_INFO("Robot has detected a survivor west!");
 				}
 	if (survivor_srv.response.objectNorth)
 		for (int i = 0; i < survivor_srv.request.sensorRange; i++)
@@ -270,7 +272,7 @@ int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][
 				{
 					newSurvivorsDetected++;
 					curr_world[sub_x - 1 - i][sub_y] = SURVIVOR;
-					ROS_INFO("Robot has detected a survivor north!");
+					// ROS_INFO("Robot has detected a survivor north!");
 				}
 	if (survivor_srv.response.objectSouth)
 		for (int i = 0; i < survivor_srv.request.sensorRange; i++)
@@ -279,7 +281,7 @@ int detect_survivors(group_15::Sensor &survivor_srv, int (&curr_world)[BOARD_H][
 				{
 					newSurvivorsDetected++;
 					curr_world[sub_x + 1 + i][sub_y] = SURVIVOR;
-					ROS_INFO("Robot has detected a survivor south!");
+					// ROS_INFO("Robot has detected a survivor south!");
 				}
 	return newSurvivorsDetected;
 }
@@ -375,7 +377,7 @@ void generate_known_world(int (&world)[BOARD_H][BOARD_W], int &sub_x, int &sub_y
 		std::cerr << "Failed to save the current world to world.csp" << std::endl;
 		exit(1);
 	}
-	ROS_INFO("Writing robot's current interpretation to world file.");
+	// ROS_INFO("Writing robot's current interpretation to world file.");
 
 	file << "#define Visited " << VISITED << ";\n";
 	file << "#define Unvisited " << EMPTY << ";\n";
@@ -425,12 +427,12 @@ void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &s
 
 	if (currentPath == SURVEY_AREA)
 	{
-		ROS_INFO("Calculating a path to survey remaining area");
+		// ROS_INFO("Calculating a path to survey remaining area");
 		std::system(PAT_CMD_EXPLORE.c_str());
 	}
 	else if (currentPath == COLLECT_SURVIVORS)
 	{
-		ROS_INFO("Calculating a path to collect remaining survivors");
+		// ROS_INFO("Calculating a path to collect remaining survivors");
 		int status = std::system(PAT_CMD_COLLECT_SURVIVORS_BFS.c_str());
 		if (status < 0)
 		{
@@ -443,7 +445,7 @@ void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &s
 			{
 				if (WEXITSTATUS(status) == 124)
 				{ 
-                    ROS_INFO("BFS Path calculation for survivor collection took too long, now calculating DFS path.");
+                    // ROS_INFO("BFS Path calculation for survivor collection took too long, now calculating DFS path.");
 					std::system(PAT_CMD_COLLECT_SURVIVORS_DFS.c_str());
 				}
 			}
@@ -457,7 +459,7 @@ void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &s
 	}
 	else if (currentPath == GO_HOME)
 	{
-		ROS_INFO("Calculating a path to go home");
+		// ROS_INFO("Calculating a path to go home");
 		int status = std::system(PAT_CMD_GO_HOME_BFS.c_str());
 		if (status < 0)
 		{
@@ -470,7 +472,7 @@ void regenerate_moves(int (&current_world)[BOARD_H][BOARD_W], int &sub_x, int &s
 			{
 				if (WEXITSTATUS(status) == 124)
 				{ 
-                    ROS_INFO("BFS Path calculation for going home took too long, now calculating DFS path.");
+                    // ROS_INFO("BFS Path calculation for going home took too long, now calculating DFS path.");
 					std::system(PAT_CMD_GO_HOME_DFS.c_str());
 				}
 			}

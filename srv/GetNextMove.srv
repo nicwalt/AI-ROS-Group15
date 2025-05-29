@@ -1,0 +1,8 @@
+int32[499] flattened_grid  # 7x7 grid
+int32 sub_x
+int32 sub_y
+int32 onboard
+int32 survivors_seen
+int32 survivors_saved
+---
+string next_move

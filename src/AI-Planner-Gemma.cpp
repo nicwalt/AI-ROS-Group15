@@ -1,4 +1,4 @@
-// My AI-Planner-Gemma.cpp
+// AI-Planner-Gemma.cpp
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
