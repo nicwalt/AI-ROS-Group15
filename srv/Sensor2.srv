@@ -1,0 +1,11 @@
+int32 sensorRange
+---
+bool objectNorth
+bool objectSouth
+bool objectEast
+bool objectWest
+bool objectDetected
+int32[] northRadar
+int32[] southRadar
+int32[] eastRadar
+int32[] westRadar

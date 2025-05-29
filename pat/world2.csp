@@ -1,16 +1,26 @@
 #define Visited -1;
 #define Unvisited 0;
+<<<<<<< Updated upstream
 #define Sub 1;
 #define Hostile 2;
 #define Survivor 3;
 
 #define SUB_HOME_X 7;
 #define SUB_HOME_Y 0;
+=======
+#define SUB2 1;
+#define Hostile 2;
+#define Survivor 3;
+
+#define SUB2_HOME_X 7;
+#define SUB2_HOME_Y 7;
+>>>>>>> Stashed changes
 #define Rows 8;
 #define Cols 8;
 #define maxCapacity 2;
 
 var world[Rows][Cols]:{Visited..Survivor} = [
+<<<<<<< Updated upstream
 -1, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -24,4 +34,19 @@ var world[Rows][Cols]:{Visited..Survivor} = [
 // Position of sub
 var xpos:{0..Rows-1} = 7;
 var ypos:{0..Cols-1} = 0;
+=======
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, -1]
+];
+
+// Position of SUB2
+var xpos:{0..Rows-1} = 7;
+var ypos:{0..Cols-1} = 7;
+>>>>>>> Stashed changes
 var onBoard:{0..maxCapacity} = 0;

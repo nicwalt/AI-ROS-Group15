@@ -1,0 +1,101 @@
+// AI-Manager.csp
+#include "world.csp"
+
+event request_plan        // Request new plan from LLM
+event receive_plan_collect  // Receive collect plan
+event receive_plan_return   // Receive return plan
+event receive_plan_explore  // Receive explore plan
+event execute_collect     // Execute collect action
+event execute_return      // Execute return action
+event execute_explore     // Execute explore action
+event gazebo_collect      // Update Gazebo for collect
+event gazebo_return       // Update Gazebo for return
+event gazebo_explore      // Update Gazebo for explore
+
+event state_update_x      // X coordinate update
+event state_update_y      // Y coordinate update
+event state_update_survivor // Survivor status update
+event state_update_hostile // Hostile status update
+
+// Position tracker events
+event gazebo_move_x       // New X position
+event gazebo_move_y       // New Y position
+
+event mission_complete    // Mission termination
+
+#define home (xpos == SUB_HOME_X && ypos == SUB_HOME_Y);
+#define noSurvivors ((forall i:{0..Rows-1} @ (forall j:{0..Cols-1} @ (world[i][j] != Survivor)) && (onBoard != maxCapacity || home)) || (onBoard == maxCapacity && home);
+
+// ===== SAFETY CHECKS =====
+#define isSafe0 (world[xpos][ypos] == Survivor);  // Collect only survivors
+#define isSafe1 (onBoard >= maxCapacity);         // Return only when full
+#define isSafe2 true;                             // Explore always permitted
+
+PlannerAgent() = 
+    request_plan ->               // Request new plan
+    (
+        receive_plan_collect -> execute_collect -> Skip
+        []
+        receive_plan_return -> execute_return -> Skip
+        []
+        receive_plan_explore -> execute_explore -> Skip
+    )
+
+ValidatorAgent() = 
+    (
+        execute_collect -> 
+        if isSafe0 then gazebo_collect -> Skip else Skip fi
+        
+        []
+        
+        execute_return -> 
+        if isSafe1 then gazebo_return -> Skip else Skip fi
+        
+        []
+        
+        execute_explore -> 
+        if isSafe2 then gazebo_explore -> Skip else Skip fi
+    )
+
+// ===== STATE UPDATE HANDLER =====
+StateHandler() = 
+    state_update_x?x -> 
+    state_update_y?y -> 
+    state_update_survivor?survivor -> 
+    state_update_hostile?hostile -> 
+        if (survivor == 1) then
+            world[x][y] := Visited ; 
+            onBoard := onBoard + 1 ; 
+            Skip
+        [] (hostile == 1) then
+            world[x][y] := Hostile ; 
+            Skip
+        [] (survivor == 0 && hostile == 0) then
+            world[x][y] := Visited ; 
+            Skip
+        fi ;
+        StateHandler()
+
+// ===== POSITION TRACKER =====
+PositionTracker() = 
+    gazebo_move_x?new_x -> 
+    gazebo_move_y?new_y -> 
+        xpos := new_x ;
+        ypos := new_y ;
+        PositionTracker()
+
+// ===== MAIN AI MANAGER =====
+AIManager() = 
+    if noSurvivors then 
+        mission_complete -> Skip  // Terminate when done
+    else
+        ( PlannerAgent() 
+        || ValidatorAgent() 
+        || StateHandler() 
+        || PositionTracker()
+        ) ;
+        AIManager()
+    fi
+
+// ===== SYSTEM ENTRY POINT =====
+System = AIManager()

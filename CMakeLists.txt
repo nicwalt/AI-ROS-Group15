@@ -62,6 +62,8 @@ add_service_files(
   FILES
   UpdateGrid.srv
   Sensor.srv
+  UpdateGrid2.srv
+  Sensor2.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -218,3 +220,11 @@ add_dependencies(update_grid ${catkin_EXPORTED_TARGETS})
 add_executable(search_rescue src/search_rescue.cpp)
 target_link_libraries(search_rescue ${catkin_LIBRARIES})
 add_dependencies(search_rescue ${catkin_EXPORTED_TARGETS})
+
+add_executable(search_rescue2 src/search_rescue2.cpp)
+target_link_libraries(search_rescue2 ${catkin_LIBRARIES})
+add_dependencies(search_rescue2 ${catkin_EXPORTED_TARGETS})
+
+add_executable(update_grid2 src/update_grid2.cpp)
+target_link_libraries(update_grid2 ${catkin_LIBRARIES})
+add_dependencies(update_grid2 ${catkin_EXPORTED_TARGETS})

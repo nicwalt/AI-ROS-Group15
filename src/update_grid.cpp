@@ -55,6 +55,7 @@ std::map<geometry_msgs::Point, std::string, ComparePoints> objectPositions;
 
 gazebo_msgs::SpawnModel createSpawnRequest(int modelType, geometry_msgs::Point position);
 bool updateGrid(group_15::UpdateGrid::Request &req, group_15::UpdateGrid::Response &res);
+<<<<<<< Updated upstream
 bool hostileSensor(group_15::Sensor::Request &req, group_15::Sensor::Response &res, const std::string& modelName);
 bool survivorSensor(group_15::Sensor::Request &req, group_15::Sensor::Response &res, const std::string& modelName);
 
@@ -111,6 +112,38 @@ int main(int argc, char **argv)
     ros::ServiceServer updateGridService = n.advertiseService("update_grid", updateGrid);
     ros::spin();
     return 0;
+=======
+bool hostileSensor2(group_15::Sensor::Request &req, group_15::Sensor::Response &res);
+bool survivorSensor(group_15::Sensor::Request &req, group_15::Sensor::Response &res);
+
+int main(int argc, char **argv)
+{
+	ros::init(argc, argv, "gazebo_object_manager");
+	ros::NodeHandle n;
+	bot_location = n.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+	srv.request.model_name = "robot_saver";
+
+	for (int i = 0; i < BOARD_H; ++i)
+		for (int j = 0; j < BOARD_W; ++j)
+			currentGrid[i][j] = EMPTY;
+
+	for (int i = 0; i < BOARD_H; ++i)
+		for (int j = 0; j < BOARD_W; ++j)
+		{
+			coordinates[i][j].x = i * GRID_WIDTH;
+			coordinates[i][j].y = j * GRID_WIDTH;
+			coordinates[i][j].z = 0;
+		}
+
+	setClient = n.serviceClient<gazebo_msgs::SetModelState>("gazebo/set_model_state");
+	spawnClient = n.serviceClient<gazebo_msgs::SpawnModel>("gazebo/spawn_sdf_model");
+	deleteClient = n.serviceClient<gazebo_msgs::DeleteModel>("gazebo/delete_model");
+	ros::ServiceServer HostileSenService = n.advertiseService("hostile_sensor", hostileSensor2);
+	ros::ServiceServer SurvivorSenService = n.advertiseService("survivor_sensor", survivorSensor);
+	ros::ServiceServer updateGridService = n.advertiseService("update_grid", updateGrid);
+	ros::spin();
+	return 0;
+>>>>>>> Stashed changes
 }
 
 gazebo_msgs::SpawnModel createSpawnRequest(int modelType, geometry_msgs::Point position)
@@ -317,7 +350,11 @@ bool updateGrid(group_15::UpdateGrid::Request &req, group_15::UpdateGrid::Respon
     return true;
 }
 
+<<<<<<< Updated upstream
 bool hostileSensor(group_15::Sensor::Request &req, group_15::Sensor::Response &res, const std::string& modelName)
+=======
+bool hostileSensor2(group_15::Sensor::Request &req, group_15::Sensor::Response &res)
+>>>>>>> Stashed changes
 {
     std::lock_guard<std::mutex> lock(grid_mutex);
     res.objectNorth = false;

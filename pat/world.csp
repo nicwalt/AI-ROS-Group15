@@ -12,6 +12,7 @@
 
 var world[Rows][Cols]:{Visited..Survivor} = [
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 -1, -1, -1, -1, -1, -1, -1, -1, 
 2, -1, -1, -1, -1, -1, -1, -1, 
 -1, -1, -1, 0, 2, -1, -1, -1, 
@@ -36,3 +37,19 @@ var world[Rows][Cols]:{Visited..Survivor} = [
 var xpos:{0..Rows-1} = 0;
 var ypos:{0..Cols-1} = 0;
 var onBoard:{0..maxCapacity} = 0;
+=======
+-1, -1, -1, -1, -1, -1, -1, 2, 
+-1, -1, -1, -1, -1, -1, -1, 2, 
+-1, -1, -1, -1, -1, -1, -1, -1, 
+0, 0, -1, -1, -1, -1, -1, -1, 
+0, 0, -1, 0, 0, -1, 2, 2, 
+0, 0, 0, 2, 0, -1, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 0, 0
+];
+
+// Position of sub
+var xpos:{0..Rows-1} = 5;
+var ypos:{0..Cols-1} = 5;
+var onBoard:{0..maxCapacity} = 1;
+>>>>>>> Stashed changes

@@ -1,5 +1,5 @@
 // path.csp
-#include "world.csp";
+#include "world2.csp";
 
 #define MoveUpCond (xpos != 0) && (world[xpos-1][ypos] != Hostile) && (onBoard != maxCapacity || world[xpos-1][ypos] != Survivor);
 #define MoveUpCondVisited (world[xpos-1][ypos] == Visited);
@@ -31,6 +31,6 @@ UnvisitedMove() = (MoveIfVisited() [] MoveIfNotVisited());UnvisitedMove();
 VisitedMove() = (MoveIfNotVisited() [] MoveIfVisited());VisitedMove();
 
 
-#define home (xpos == SUB_HOME_X && ypos == SUB_HOME_Y);
+#define home (xpos == SUB2_HOME_X && ypos == SUB2_HOME_Y);
 #define goalAreaChecked (&& i:{0..Rows-1}@(&& j:{0..Cols-1}@(world[i][j] == Visited || world[i][j] == Hostile)) && home);
 #define noSurvivors ((&& i:{0..Rows-1}@(&& j:{0..Cols-1}@(world[i][j] != Survivor)) && (onBoard != maxCapacity || home)) || (onBoard == maxCapacity && home));
